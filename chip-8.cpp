@@ -116,26 +116,37 @@ class Chip8 {
                     break;
                 case 0x8000: 
                     switch (opcode & 0x000F) {
+                        
                         case 0x0000: // 8xy0: Stores the value of Vy in Vx
                             V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
+                        
                         case 0x0001: // 8xy1: Stores the value of Vx | Vy in Vx
                             V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] | V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
+                        
                         case 0x0002: // 8xy2: Stores the value of Vx & Vy in Vx
                             V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] & V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
+                        
                         case 0x0003: // 8xy3: Stores the value of Vx ^ Vy in Vx
                             V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] ^ V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
+                        
                         case 0x0004: // 8xy4: Sets Vx = Vx + Vy and Vf = 1 if sum > 255 else 0
                             if( (V[((opcode & 0x0F00) >> 8)] + V[((opcode & 0x00F0) >> 4)]) > 255 ) V[15] = 1;
                             else V[15] = 0;
                             V[((opcode & 0x0F00) >> 8)] += V[((opcode & 0x00F0) >> 4)];
+                            pc += 2;
+                            break;
+                        case 0x0005: // 8xy5 Sets Vx = Vx - Vy and Vf = 0 is there is a borrow else Vf = 1
+                            if(V[((opcode & 0x00F0) >> 4)] > V[((opcode & 0x0F00) >> 8)]) V[15] = 0;
+                            else V[15] = 1;
+                            V[((opcode & 0x0F00) >> 8)] -= V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
                     }
@@ -216,11 +227,14 @@ int main() {
 
     // Chip8 chip8("pong.rom");
     
-    if (0xFF + 0x7F > 255) {
-        std::cout << "Greater";
-    } else {
-        std::cout << "Smaller";
-    }
+    unsigned char t = 0x6F - 0xFF;
+    std::cout << (int ) t << std::endl;
+
+    // if ( 0x7F - 0xFF > 255) {
+    //     std::cout << "Greater";
+    // } else {
+    //     std::cout << "Smaller";
+    // }
 
     return 0;
 }
