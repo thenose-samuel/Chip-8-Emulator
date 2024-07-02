@@ -111,6 +111,37 @@ class Chip8 {
                     printRegisters();
                     break;
                 
+                case 0x7000: // 7xkk: Adds the value kk to Vx and stores the value in Vx
+                    V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] + (opcode & 0x00FF);
+                    break;
+                case 0x8000: 
+                    switch (opcode & 0x000F) {
+                        case 0x0000: // 8xy0: Stores the value of Vy in Vx
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x00F0) >> 4)];
+                            pc += 2;
+                            break;
+                        case 0x0001: // 8xy1: Stores the value of Vx | Vy in Vx
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] | V[((opcode & 0x00F0) >> 4)];
+                            pc += 2;
+                            break;
+                        case 0x0002: // 8xy2: Stores the value of Vx & Vy in Vx
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] & V[((opcode & 0x00F0) >> 4)];
+                            pc += 2;
+                            break;
+                        case 0x0003: // 8xy3: Stores the value of Vx ^ Vy in Vx
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] ^ V[((opcode & 0x00F0) >> 4)];
+                            pc += 2;
+                            break;
+                        case 0x0004: // 8xy4: Sets Vx = Vx + Vy and Vf = 1 if sum > 255 else 0
+                            if( (V[((opcode & 0x0F00) >> 8)] + V[((opcode & 0x00F0) >> 4)]) > 255 ) V[15] = 1;
+                            else V[15] = 0;
+                            V[((opcode & 0x0F00) >> 8)] += V[((opcode & 0x00F0) >> 4)];
+                            pc += 2;
+                            break;
+                    }
+                    break;
+
+                
                 default:
                     std::cout << "Error unknown opcode: " << std::hex << opcode << std::endl;
                     break;
@@ -183,7 +214,13 @@ class Chip8 {
 
 int main() {
 
-    Chip8 chip8("pong.rom");
+    // Chip8 chip8("pong.rom");
     
+    if (0xFF + 0x7F > 255) {
+        std::cout << "Greater";
+    } else {
+        std::cout << "Smaller";
+    }
+
     return 0;
 }
