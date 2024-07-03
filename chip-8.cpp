@@ -143,16 +143,47 @@ class Chip8 {
                             V[((opcode & 0x0F00) >> 8)] += V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
-                        case 0x0005: // 8xy5 Sets Vx = Vx - Vy and Vf = 0 is there is a borrow else Vf = 1
+                        case 0x0005: // 8xy5: Sets Vx = Vx - Vy and Vf = 0 is there is a borrow else Vf = 1
                             if(V[((opcode & 0x00F0) >> 4)] > V[((opcode & 0x0F00) >> 8)]) V[15] = 0;
                             else V[15] = 1;
                             V[((opcode & 0x0F00) >> 8)] -= V[((opcode & 0x00F0) >> 4)];
                             pc += 2;
                             break;
+                        case 0x0006: // 8xy6: Sets Vf = 1 if LSB of Vx is 1 else Vf = 0 then Vx = Vx / 2 
+                            if ((V[((opcode & 0x0F00) >> 8)] & 1) == 1) V[15] = 1;
+                            else V[15] = 0;
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] >> 1;
+                            pc += 2;
+                            break;
+                        case 0x0007: // 8xy7: Sets Vx = Vy - Vx and Vf = 0 is there is a borrow else Vf = 1
+                            if(V[((opcode & 0x00F0) >> 4)] < V[((opcode & 0x0F00) >> 8)]) V[15] = 0;
+                            else V[15] = 1;
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x00F0) >> 4)] - V[((opcode & 0x0F00) >> 8)];
+                            pc += 2;
+                            break;
+                        case 0x000E: // Sets Vf = 1 if MSB of Vx is 1 else Vf = 0 then Vx = 2 * Vx
+                            if ((V[((opcode & 0x0F00) >> 8)] & 0x80) == 1) V[15] = 1;
+                            else V[15] = 0;
+                            V[((opcode & 0x0F00) >> 8)] = V[((opcode & 0x0F00) >> 8)] << 1;
+                            pc += 2;
+                            break;
                     }
                     break;
-
                 
+                case 0x9000: // 9xy0: Skip next instruction if Vx != Vy
+                    if ( V[((opcode & 0x0F00) >> 8)] != V[((opcode & 0x00F0) >> 4)])
+                        pc += 4;
+                    else
+                        pc += 2;
+                    break;
+                
+                case 0xB000:
+                    pc = V[0] + (opcode & 0x0FFF);
+                    break;
+
+                case 0xC000:
+                    break;
+
                 default:
                     std::cout << "Error unknown opcode: " << std::hex << opcode << std::endl;
                     break;
@@ -228,7 +259,7 @@ int main() {
     // Chip8 chip8("pong.rom");
     
     unsigned char t = 0x6F - 0xFF;
-    std::cout << (int ) t << std::endl;
+    std::cout << (32 >> 1) << std::endl;
 
     // if ( 0x7F - 0xFF > 255) {
     //     std::cout << "Greater";
